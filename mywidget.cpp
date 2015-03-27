@@ -9,8 +9,6 @@ myWidget::myWidget(QWidget *parent) :
     openstl->setText(tr("打开stl文件"));
     moveLeft = new QPushButton(tr("左移"));
     moveRight = new QPushButton(tr("右移"));
-    moveForward = new QPushButton(tr("前移"));
-    moveBackward = new QPushButton(tr("后移"));
     moveUp = new QPushButton(tr("上移"));
     moveDown = new QPushButton(tr("下移"));
 
@@ -18,10 +16,6 @@ myWidget::myWidget(QWidget *parent) :
             opengl,SLOT(slot_moveLeft()));
     connect(moveRight,SIGNAL(clicked()),
             opengl,SLOT(slot_moveRight()));
-    connect(moveForward,SIGNAL(clicked()),
-            opengl,SLOT(slot_moveForward()));
-    connect(moveBackward,SIGNAL(clicked()),
-            opengl,SLOT(slot_moveBackWard()));
     connect(moveUp,SIGNAL(clicked()),
             opengl,SLOT(slot_moveUp()));
     connect(moveDown,SIGNAL(clicked()),
@@ -32,8 +26,6 @@ myWidget::myWidget(QWidget *parent) :
     hbox->addWidget(openstl);
     hbox->addWidget(moveLeft);
     hbox->addWidget(moveRight);
-    hbox->addWidget(moveForward);
-    hbox->addWidget(moveBackward);
     hbox->addWidget(moveUp);
     hbox->addWidget(moveDown);
 
@@ -64,4 +56,9 @@ void myWidget::slot_openStl()
         emit signal_loadStl(path);
     }
 
+}
+
+void myWidget::openOutside(QString path)
+{
+    emit signal_loadStl(path);
 }

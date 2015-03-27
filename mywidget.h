@@ -15,14 +15,14 @@ private:
     QPushButton *openstl;
     QPushButton *moveLeft;
     QPushButton *moveRight;
-    QPushButton *moveForward;
-    QPushButton *moveBackward;
     QPushButton *moveUp;
     QPushButton *moveDown;
 signals:
     void signal_loadStl(QString path);
 public slots:
     void slot_openStl();
+public:
+    void openOutside(QString path);
     
 };
 

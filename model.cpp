@@ -4,27 +4,29 @@
 #include <QDateTime>
 
 
-stlModel::stlModel(QObject *parent) :
+STLModel::STLModel(QObject *parent) :
     QObject(parent)
-{
+{   
+    model_clear();
 }
 
-void stlModel::model_load(QString path)
+void STLModel::model_load(QString path)
 {
     //将这个路径的path载入咱们的QList<face *> model中
     QFile file(path);
     if(file.open(QIODevice::ReadOnly))
     {
         QByteArray header = file.read(80);
-       // qDebug() << "here comes header:" << endl << header;
         file.close();
 
         if (header.trimmed().startsWith("solid") && header.contains("\n"))
         {
+            qDebug("start to read text");
             model_readText(path);
         }
         else
         {
+            qDebug("huaile");
             model_readBinary(path);
         }
     }
@@ -32,17 +34,16 @@ void stlModel::model_load(QString path)
     {
         QMessageBox::information(0,tr("错误"),tr("未能成功加载文件"));
     }
-
-
-
 }
 
-void stlModel::model_readText(QString path)
+void STLModel::model_readText(QString path)
 {
+    model_clear();
+
     QDateTime time = QDateTime::currentDateTime();//获取系统现在的时间
 
-    qDebug()<< time.toString("yyyy-MM-dd hh:mm:ss ddd"); //设置显示格式
-    model_clear();
+//    qDebug()<< time.toString("yyyy-MM-dd hh:mm:ss ddd"); //设置显示格式
+
     QFile file(path);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
 
@@ -82,35 +83,34 @@ void stlModel::model_readText(QString path)
         triAngel.append(point1);
         triAngel.append(point2);
         triAngel.append(point3);
+        //以下三句是更新模型的大小
+        model_getSizeWhileReadPoint(point1);
+        model_getSizeWhileReadPoint(point2);
+        model_getSizeWhileReadPoint(point3);
 
         tempFace = new face;
         tempFace->setNormalVector(vn);
         tempFace->setTriAngle(triAngel);
 
-        model.append(tempFace);
+        faceList.append(tempFace);
         count++;
-
-        if(count <10)
-        {
-            qDebug()<<model.at(count-1)->getTriAngle();
-            qDebug()<<count;
-        }
     }
 
 
     time = QDateTime::currentDateTime();//获取系统现在的时间
-    qDebug()<< time.toString("yyyy-MM-dd hh:mm:ss ddd"); //设置显示格式
+//    qDebug()<< time.toString("yyyy-MM-dd hh:mm:ss ddd"); //设置显示格式
     file.close();
     emit signal_finishLoad();
 }
 
 
-void stlModel::model_readBinary(QString path)
+void STLModel::model_readBinary(QString path)
 {
+    model_clear();
     //http://qt-project.org/forums/viewthread/14726
     QFile file(path);
-    file.open(QIODevice::ReadOnly);
-
+    if(!file.open(QIODevice::ReadOnly))
+        return;
     QVector3D vn;
     QVector3D point1;
     QVector3D point2;
@@ -173,11 +173,17 @@ void stlModel::model_readBinary(QString path)
             triAngel.append(point1);
             triAngel.append(point2);
             triAngel.append(point3);
+
+            //以下三句是更新模型的大小
+            model_getSizeWhileReadPoint(point1);
+            model_getSizeWhileReadPoint(point2);
+            model_getSizeWhileReadPoint(point3);
+
             tempFace = new face;
             tempFace->setNormalVector(vn);
             tempFace->setTriAngle(triAngel);
 
-            model.append(tempFace);
+            faceList.append(tempFace);
 
             count++;
         }
@@ -188,31 +194,36 @@ void stlModel::model_readBinary(QString path)
 
         }
     }
-
-    //qDebug() << m_model.size() << "facets read in readStlBinaryFormat";
     file.close();
-
+    qDebug()<<tr("finish load");
+    qDebug()<<faceList.size();
+    emit signal_finishLoad();
 }
 
-void stlModel::model_clear()
+void STLModel::model_clear()
 {
-    model.clear();
+    faceList.clear();
+    size.smallX = 0;
+    size.largeX = 0;
+    size.smallY = 0;
+    size.largeY = 0;
+    size.smallZ = 0;
+    size.largeZ = 0;
 }
 
-void stlModel::model_draw()
+void STLModel::model_draw()
 {
     QVector<QVector3D> triAngle;
     QVector3D normal;
     GLfloat normalVector[3];
-    qDebug()<<"da xiao shi"<<model.size();
-    for(int i=0; i<model.size(); i++)
+    for(int i=0; i<faceList.size(); i++)
     {
-        normal = model.at(i)->getNormalVector();
+        normal = faceList.at(i)->getNormalVector();
         normal.normalize();
         normalVector[0] = normal.x();
         normalVector[1] = normal.y();
         normalVector[2] = normal.z();
-        triAngle = model.at(i)->getTriAngle();
+        triAngle = faceList.at(i)->getTriAngle();
       glBegin(GL_TRIANGLES);//绘制三角面片
         glNormal3fv(normalVector);
         glVertex3f(triAngle.at(0).x(),triAngle.at(0).y(),triAngle.at(0).z() );
@@ -228,20 +239,59 @@ void stlModel::model_draw()
 //        glEnd();
 }
 
-void stlModel::model_test()
+void STLModel::model_test()
 {
     QVector<QVector3D> test;
-    if(model.isEmpty())
+    if(faceList.isEmpty())
         return;
-    qDebug()<<tr("大小是")<<model.size();
     for(int i=0;i<10;i++)
     {
-        test = model.at(i)->getTriAngle();
-        qDebug()<<test;
+        test = faceList.at(i)->getTriAngle();
     }
 }
 
-QVector3D stlModel::getCoordinateFromString(QString line)
+modelSize STLModel::model_getSize()
+{
+    return size;
+}
+
+void STLModel::model_getSizeWhileReadPoint(QVector3D point)
+{
+    float pointX = point.x();
+    float pointY = point.y();
+    float pointZ = point.z();
+   //处理X
+   if(pointX < size.smallX)
+       size.smallX = pointX;
+   else if(pointX > size.largeX)
+       size.largeX = pointX;
+   //处理Y
+   if(pointY < size.smallY)
+       size.smallY = pointY;
+   else if(pointY > size.largeY)
+       size.largeY = pointY;
+   //处理Z
+   if(pointZ < size.smallZ)
+       size.smallZ = pointZ;
+   else if(pointZ > size.largeZ)
+       size.largeZ = pointZ;
+}
+
+QVector3D STLModel::model_getCenter(modelSize size)
+{
+    QVector3D center;
+    center.setX( (size.largeX + size.smallX)/2 );
+    center.setY( (size.largeY + size.smallY)/2 );
+    center.setZ( (size.largeZ + size.smallZ)/2 );
+    return center;
+}
+
+int STLModel::model_getFacesCount()
+{
+    return faceList.size();
+}
+
+QVector3D STLModel::getCoordinateFromString(QString line)
 {
      QVector3D coordinate;
      QVector<float> point;

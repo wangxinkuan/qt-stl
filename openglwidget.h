@@ -3,6 +3,11 @@
 
 #include <QGLWidget>
 #include <model.h>
+#include <camera.h>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <arcball.h>
+#include <QKeyEvent>
 
 typedef struct lightingStruct{
     GLfloat ambient[4];
@@ -23,10 +28,27 @@ class openglWidget : public QGLWidget
     Q_OBJECT
 public:
     explicit openglWidget(QWidget *parent = 0);
+
 private:
-    stlModel *model;
+
+    Camera cam;
+
+    STLModel *model;
+    QVector3D centerInOpenGlWid;
+    QVector3D cameraInOpenGlWid;
+
+    QPointF lastPos;
+
+    float radianZ;
+    float radianX;
+    float r;
+
+    arcBall arcballInOpenGLWid;
+
+    float *matrixForMouseRotate;
+
 private:
-    float rotateX;
+    float rotateX;  //现在是这样单独的变一个轴 以后就是鼠标拖动了
     float rotateY;
     float rotateZ;
 public:
@@ -44,15 +66,19 @@ public slots:
 
     void slot_moveLeft();
     void slot_moveRight();
-    void slot_moveForward();
-    void slot_moveBackWard();
     void slot_moveUp();
     void slot_moveDown();
 
 public:
     void setMaterial(materialStruct *material);
 
-    
+    void RotateY(float angle);
+    void RotateX(float angle);
+protected:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // OPENGLWIDGET_H
