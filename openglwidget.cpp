@@ -13,9 +13,6 @@ openglWidget::openglWidget(QWidget *parent) :
 
 void openglWidget::initialOpengl()
 {   
-    qDebug("huhfudh");
-    qDebug()<<model->model_getFacesCount();
-    qDebug("hahahah");
     centerInOpenGlWid = model->model_getCenter(model->model_getSize());
 
     glMatrixMode(GL_MODELVIEW);
@@ -92,27 +89,6 @@ void openglWidget::initializeGL()
         {1.0,1.0,1.0,1.0},
         100.0
     };
-    modelSize size = model->model_getSize();
-    GLfloat light0_pos[4] = {size.largeX*2,
-                            (size.largeY+size.smallY)/2,
-                            (size.largeZ+size.smallZ)/2,
-                            0.00
-                            };
-    GLfloat light1_pos[4] = {size.smallX*2,
-                            (size.largeY+size.smallY)/2,
-                            (size.largeZ+size.smallZ)/2,
-                            0.00
-                            };
-    GLfloat light2_pos[4] = {(size.largeX+size.smallX)/2,
-                            (size.largeY+size.smallY)/2,
-                            size.largeZ*2,
-                            0.00
-                            };
-    GLfloat light3_pos[4] = {(size.largeX+size.smallX)/2,
-                            (size.largeY+size.smallY)/2,
-                            size.smallZ*2,
-                            0.00
-                            };
 
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     glDisable( GL_CULL_FACE);       //加上上面俩句 就能把反面光也调出来了
@@ -123,28 +99,9 @@ void openglWidget::initializeGL()
     glLightfv(GL_LIGHT0,GL_AMBIENT,whiteLighting.ambient);
     glLightfv(GL_LIGHT0,GL_DIFFUSE,whiteLighting.diffuse);
     glLightfv(GL_LIGHT0,GL_SPECULAR,whiteLighting.specular);
-  //  glLightfv(GL_LIGHT0,GL_POSITION,light0_pos);
-
-//    glEnable(GL_LIGHT1);
-//    glLightfv(GL_LIGHT1,GL_AMBIENT,whiteLighting.ambient);
-//    glLightfv(GL_LIGHT1,GL_DIFFUSE,whiteLighting.diffuse);
-//    glLightfv(GL_LIGHT1,GL_SPECULAR,whiteLighting.specular);
-//    glLightfv(GL_LIGHT1,GL_POSITION,light1_pos);
-
-//    glEnable(GL_LIGHT2);
-//    glLightfv(GL_LIGHT2,GL_AMBIENT,whiteLighting.ambient);
-//    glLightfv(GL_LIGHT2,GL_DIFFUSE,whiteLighting.diffuse);
-//    glLightfv(GL_LIGHT2,GL_SPECULAR,whiteLighting.specular);
-//    glLightfv(GL_LIGHT2,GL_POSITION,light2_pos);
-
-//    glEnable(GL_LIGHT3);
-//    glLightfv(GL_LIGHT3,GL_AMBIENT,whiteLighting.ambient);
-//    glLightfv(GL_LIGHT3,GL_DIFFUSE,whiteLighting.diffuse);
-//    glLightfv(GL_LIGHT3,GL_SPECULAR,whiteLighting.specular);
-//    glLightfv(GL_LIGHT3,GL_POSITION,light3_pos);uj
-
 
     //这里暂时没有指定光源的位置
+
     setMaterial(&whiteShinyMaterial);
 
     //  glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
@@ -166,7 +123,6 @@ void openglWidget::slot_recieveStl(QString path)
 
 void openglWidget::slot_finishLoadStl()
 {
-    qDebug()<<"slot_finishLoadStl updateGl";
     initialOpengl();
     updateGL();
 }

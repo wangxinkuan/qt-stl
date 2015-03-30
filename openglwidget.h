@@ -6,7 +6,6 @@
 #include <camera.h>
 #include <QMouseEvent>
 #include <QWheelEvent>
-#include <arcball.h>
 #include <QKeyEvent>
 
 typedef struct lightingStruct{
@@ -39,18 +38,10 @@ private:
 
     QPointF lastPos;
 
-    float radianZ;
-    float radianX;
-    float r;
 
-    arcBall arcballInOpenGLWid;
 
     float *matrixForMouseRotate;
 
-private:
-    float rotateX;  //现在是这样单独的变一个轴 以后就是鼠标拖动了
-    float rotateY;
-    float rotateZ;
 public:
     void initialOpengl();
 protected:
