@@ -13,4 +13,8 @@ SOURCES += \
     mywidget.cpp \
     main.cpp \
     camera.cpp
+
+LIBS += opengl32.lib
+LIBS += glu32.lib
+
 RC_FILE +=stlico.rc

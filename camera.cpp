@@ -1,4 +1,4 @@
-#include "camera.h"
+﻿#include "camera.h"
 #include <GL/glu.h>
 
  /* 构造函数 */
@@ -17,7 +17,7 @@ void Camera::setCamera( float eyeX, float eyeY, float eyeZ,
     up.set(upX, upY, upZ);
     Vector3 upvec(up.x-eye.x,up.y-eye.y,up.z-eye.z);
 
-/* 计算n、u、v并归一化*/
+/* 计算n、u、v并归一化 */
     n.set(eye.x-look.x, eye.y-look.y, eye.z-look.z);
     u.set(upvec.cross(n).x,upvec.cross(n).y,upvec.cross(n).z);
     v.set(n.cross(u).x,n.cross(u).y,n.cross(u).z);
@@ -34,7 +34,7 @@ float Camera::getDist()
     return pow(dist,0.5);
     //return 100.0;
 }
-/* 计算变换后的视点矩阵*/
+/* 计算变换后的视点矩阵 */
 void Camera::setModelViewMatrix()
 {
     float m[16];
@@ -79,7 +79,7 @@ void Camera::pitch(float angle)
     n.set(sn*t.x+cs*s.x, sn*t.y+cs*s.y, sn*t.z+cs*s.z);
     setModelViewMatrix();
 }
-/* 摄像机绕三个轴平移的计算函数*/
+/* 摄像机绕三个轴平移的计算函数 */
 void Camera::slide(float du, float dv, float dn)
 {
     eye.x+=du*u.x+dv*v.x+dn*n.x;
@@ -90,7 +90,7 @@ void Camera::slide(float du, float dv, float dn)
     look.z+=du*u.z+dv*v.z+dn*n.z;
     setModelViewMatrix();
 }
-/* 摄像机初始化*/
+/* 摄像机初始化 */
 void Camera::setShape(float viewAngle, float aspect, float Near, float Far)
 {
     glMatrixMode(GL_PROJECTION);

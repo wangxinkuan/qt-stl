@@ -1,12 +1,12 @@
-#include <mywidget.h>
+﻿#include <mywidget.h>
 #include <QApplication>
 
 int main(int argc,char *argv[])
 {
     QApplication app(argc,argv);
-    QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
     const QStringList arguments = app.arguments();
     myWidget mywidget;
+    mywidget.resize(800, 600);
     mywidget.show();
     // The final argument is assumed to be the file to open.
     if (arguments.size() > 1 && QFile::exists(arguments.last())) {
